@@ -2,6 +2,7 @@ import { USER_POSTS_PAGE } from "../routes.js";
 import { renderHeaderComponent } from "./header-component.js";
 import { posts, goToPage } from "../index.js";
 import { renderUploadImageComponent } from "./upload-image-component.js";
+import { safeFunc } from "../api.js";
 
 export function renderAddPostPageComponent({ appEl, onAddPostClick }) {
   let imageUrl = "";
@@ -43,9 +44,10 @@ export function renderAddPostPageComponent({ appEl, onAddPostClick }) {
     }
 
     document.getElementById("add-button").addEventListener("click", () => {
+      let descriptionPost = document.getElementById("name-input").value;
       onAddPostClick({
-        description: "Описание картинки",
-        imageUrl: "https://image.png",
+        description: safeFunc(descriptionPost),
+        imageUrl: imageUrl,
       });
     });
   };

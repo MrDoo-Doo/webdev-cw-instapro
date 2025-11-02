@@ -8,7 +8,10 @@ import {
   POSTS_PAGE,
   USER_POSTS_PAGE,
 } from "./routes.js";
-import { renderPostsPageComponent } from "./components/posts-page-component.js";
+import {
+  renderPostsPageComponent,
+  renderUserPostsPageComponent,
+} from "./components/posts-page-component.js";
 import { renderLoadingPageComponent } from "./components/loading-page-component.js";
 import {
   getUserFromLocalStorage,
@@ -34,6 +37,8 @@ export const logout = () => {
 /**
  * Включает страницу приложения
  */
+let userId;
+
 export const goToPage = (newPage, data) => {
   if (
     [
@@ -68,10 +73,20 @@ export const goToPage = (newPage, data) => {
 
     if (newPage === USER_POSTS_PAGE) {
       // @@TODO: реализовать получение постов юзера из API
+      userId = data.userId;
       console.log("Открываю страницу пользователя: ", data.userId);
-      page = USER_POSTS_PAGE;
+      page = LOADING_PAGE;
       posts = [];
-      return renderApp();
+      return getPosts({ token: getToken() })
+        .then((newPosts) => {
+          page = USER_POSTS_PAGE;
+          posts = newPosts;
+          renderApp();
+        })
+        .catch((error) => {
+          console.error(error);
+          goToPage(POSTS_PAGE);
+        });
     }
 
     page = newPage;
@@ -110,9 +125,26 @@ const renderApp = () => {
     return renderAddPostPageComponent({
       appEl,
       onAddPostClick({ description, imageUrl }) {
-        // @TODO: реализовать добавление поста в API
-        console.log("Добавляю пост...", { description, imageUrl });
-        goToPage(POSTS_PAGE);
+        // @TODO: реализовать добавление поста в API "Content-Type": "application/json",
+        const personalKey = "efremov";
+        const baseHost = "https://webdev-hw-api.vercel.app";
+        const postsHost = `${baseHost}/api/v1/${personalKey}/instapro`;
+
+        return fetch(postsHost, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+          body: JSON.stringify({
+            description: description,
+            imageUrl: imageUrl,
+          }),
+        }).then((response) => {
+          console.log("Добавляю пост...", { description, imageUrl });
+          goToPage(POSTS_PAGE);
+
+          return response.json();
+        });
       },
     });
   }
@@ -125,8 +157,8 @@ const renderApp = () => {
 
   if (page === USER_POSTS_PAGE) {
     // @TODO: реализовать страницу с фотографиями отдельного пользвателя
-    appEl.innerHTML = "Здесь будет страница фотографий пользователя";
-    return;
+    // appEl.innerHTML = "Здесь будет страница фотографий пользователя";
+    return renderUserPostsPageComponent({ appEl, userId });
   }
 };
 

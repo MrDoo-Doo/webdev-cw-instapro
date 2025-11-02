@@ -69,3 +69,7 @@ export function uploadImage({ file }) {
     return response.json();
   });
 }
+
+export function safeFunc(context) {
+  return context.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+}
