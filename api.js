@@ -2,9 +2,52 @@
 // "боевая" версия инстапро лежит в ключе prod
 // const personalKey = "prod";
 // const baseHost = "https://webdev-hw-api.vercel.app";
+
 const personalKey = "efremov";
 const baseHost = "https://webdev-hw-api.vercel.app";
 const postsHost = `${baseHost}/api/v1/${personalKey}/instapro`;
+
+// export function addLike({ postId, token, likeStatus, pageNum }) {
+//   if (!likeStatus) {
+//     console.log("+Tap");
+//     return fetch(`${baseHost}/api/v1/${personalKey}/instapro/${postId}/like`, {
+//       method: "POST",
+//       headers: {
+//         Authorization: token,
+//       },
+//     })
+//       .then((response) => {
+//         if (!response.ok) {
+//           throw new Error("Like error");
+//         }
+//         return response.json();
+//       })
+//       .then((data) => {
+//         return data.posts;
+//       });
+//   } else {
+//     console.log("-Tap");
+//     return fetch(
+//       `${baseHost}/api/v1/${personalKey}/instapro/${postId}/dislike`,
+//       {
+//         method: "POST",
+//         headers: {
+//           Authorization: token,
+//         },
+//       }
+//     )
+//       .then((response) => {
+//         if (!response.ok) {
+//           throw new Error("Like error");
+//         }
+//         renderPostsPageComponent({ appEl });
+//         return response.json();
+//       })
+//       .then((data) => {
+//         return data.posts;
+//       });
+//   }
+// }
 
 export function getPosts({ token }) {
   return fetch(postsHost, {

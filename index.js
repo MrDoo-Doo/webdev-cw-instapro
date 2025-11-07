@@ -162,4 +162,166 @@ const renderApp = () => {
   }
 };
 
+// export function addLike({ postId, token, likeStatus, appEl }) {
+//   const personalKey = "efremov";
+//   const baseHost = "https://webdev-hw-api.vercel.app";
+//   if (!likeStatus) {
+//     console.log("+Tap");
+//     return fetch(`${baseHost}/api/v1/${personalKey}/instapro/${postId}/like`, {
+//       method: "POST",
+//       headers: {
+//         Authorization: token,
+//       },
+//     })
+//       .then((response) => {
+//         if (!response.ok) {
+//           throw new Error("Like error");
+//         }
+//         return response.json();
+//       })
+//       .then((data) => {
+//         return data.posts;
+//       });
+//   } else {
+//     console.log("-Tap");
+//     return fetch(
+//       `${baseHost}/api/v1/${personalKey}/instapro/${postId}/dislike`,
+//       {
+//         method: "POST",
+//         headers: {
+//           Authorization: token,
+//         },
+//       }
+//     )
+//       .then((response) => {
+//         if (!response.ok) {
+//           throw new Error("Like error");
+//         }
+//         renderPostsPageComponent({ appEl });
+//         console.log("ret");
+//         return response.json();
+//       })
+//       .then((data) => {
+//         return data.posts;
+//       });
+//   }
+// }
+function f() {
+  console.log("object");
+}
+export function addLike({ postId, token, likeStatus, pageNum }) {
+  const personalKey = "efremov";
+  const baseHost = "https://webdev-hw-api.vercel.app";
+  const postsHost = `${baseHost}/api/v1/${personalKey}/instapro`;
+  if (pageNum == 1) {
+    let pageName = POSTS_PAGE;
+  }
+
+  if (likeStatus === "false") {
+    console.log("+Tap");
+    fetch(`${baseHost}/api/v1/${personalKey}/instapro/${postId}/like`, {
+      method: "POST",
+      headers: {
+        Authorization: token,
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Like error");
+        }
+        return response.json();
+      })
+      .then(() => {
+        return getPosts({ token: getToken() })
+          .then((newPosts) => {
+            if (pageNum == 1) {
+              page = POSTS_PAGE;
+            } else {
+              page = USER_POSTS_PAGE;
+            }
+            posts = newPosts;
+            renderApp();
+          })
+          .catch((error) => {
+            console.error(error);
+            if (pageNum == 1) {
+              goToPage(POSTS_PAGE);
+            } else {
+              goToPage(USER_POSTS_PAGE);
+            }
+          });
+      });
+    // .then((response) => {
+    //   if (!response.ok) {
+    //     throw new Error("Like error");
+    //   }
+    //   renderApp();
+    //   return response.json();
+    // })
+    // .then((data) => {
+    //   return data.posts;
+    // });
+
+    // .then((newPosts) => {
+    //   page = POSTS_PAGE;
+    //   posts = newPosts;
+    //   renderApp();
+    // })
+    // .catch((error) => {
+    //   console.error(error);
+    //   goToPage(POSTS_PAGE);
+    // });
+
+    // fetch(postsHost, {
+    //   method: "GET",
+    //   headers: {
+    //     Authorization: token,
+    //   },
+    // })
+    //   .then((response) => {
+    //     if (response.status === 401) {
+    //       throw new Error("Нет авторизации");
+    //     }
+
+    //     return response.json();
+    //   })
+    //   .then((data) => {
+    //     return data.posts;
+    //   });
+  } else {
+    console.log("-Tap");
+    fetch(`${baseHost}/api/v1/${personalKey}/instapro/${postId}/dislike`, {
+      method: "POST",
+      headers: {
+        Authorization: token,
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Like error");
+        }
+        return response.json();
+      })
+      .then(() => {
+        return getPosts({ token: getToken() })
+          .then((newPosts) => {
+            if (pageNum == 1) {
+              page = POSTS_PAGE;
+            } else {
+              page = USER_POSTS_PAGE;
+            }
+            posts = newPosts;
+            renderApp();
+          })
+          .catch((error) => {
+            console.error(error);
+            if (pageNum == 1) {
+              goToPage(POSTS_PAGE);
+            } else {
+              goToPage(USER_POSTS_PAGE);
+            }
+          });
+      });
+  }
+}
 goToPage(POSTS_PAGE);

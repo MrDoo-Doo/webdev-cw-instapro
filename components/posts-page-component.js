@@ -1,12 +1,14 @@
 import { USER_POSTS_PAGE } from "../routes.js";
 import { renderHeaderComponent } from "./header-component.js";
-import { posts, goToPage } from "../index.js";
+import { posts, goToPage, user, page } from "../index.js";
+import { addLike } from "../index.js";
 
 //let formatDistanceToNow = require("date-fns/formatDistanceToNow");
 
 export function renderPostsPageComponent({ appEl }) {
-  const postsArr = posts.map((post) => {
-    return `<li class="post">
+  const postsArr = posts
+    .map((post) => {
+      return `<li class="post">
                     <div class="post-header" data-user-id="${post.user.id}">
                         <img src="${
                           post.user.imageUrl
@@ -17,8 +19,18 @@ export function renderPostsPageComponent({ appEl }) {
                       <img class="post-image" src="${post.imageUrl}">
                     </div>
                     <div class="post-likes">
-                      <button data-post-id="${post.id}" class="like-button">
+                      <button data-post-id="${post.id}" data-status="${
+        post.isLiked
+      }" class="like-button">
+                        ${
+                          post.isLiked
+                            ? `
                         <img src="./assets/images/like-active.svg">
+                        `
+                            : `
+                        <img src="./assets/images/like-not-active.svg">
+                        `
+                        }
                       </button>
                       <p class="post-likes-text">
                         Нравится: <strong>${
@@ -34,7 +46,8 @@ export function renderPostsPageComponent({ appEl }) {
                       ${post.createdAt}
                     </p>
                   </li>`;
-  });
+    })
+    .join("");
 
   const appHtml = `
   <div class="page-container">
@@ -144,12 +157,16 @@ export function renderPostsPageComponent({ appEl }) {
       });
     });
   }
+
+  let pageNum = 1;
+  Like({ pageNum });
 }
 
 export function renderUserPostsPageComponent({ appEl, userId }) {
-  const postsArr = posts.map((post) => {
-    if (post.user.id === userId) {
-      return `<li class="post">
+  const postsArr = posts
+    .map((post) => {
+      if (post.user.id === userId) {
+        return `<li class="post">
                     <div class="post-header" data-user-id="${post.user.id}">
                         <img src="${
                           post.user.imageUrl
@@ -160,8 +177,18 @@ export function renderUserPostsPageComponent({ appEl, userId }) {
                       <img class="post-image" src="${post.imageUrl}">
                     </div>
                     <div class="post-likes">
-                      <button data-post-id="${post.id}" class="like-button">
+                      <button data-post-id="${post.id}" data-status="${
+          post.isLiked
+        }" class="like-button">
+                      ${
+                        post.isLiked
+                          ? `
                         <img src="./assets/images/like-active.svg">
+                        `
+                          : `
+                        <img src="./assets/images/like-not-active.svg">
+                        `
+                      }
                       </button>
                       <p class="post-likes-text">
                         Нравится: <strong>${
@@ -177,8 +204,9 @@ export function renderUserPostsPageComponent({ appEl, userId }) {
                       ${post.createdAt}
                     </p>
                   </li>`;
-    }
-  });
+      }
+    })
+    .join("");
 
   const appHtml = `
   <div class="page-container">
@@ -192,27 +220,49 @@ export function renderUserPostsPageComponent({ appEl, userId }) {
   renderHeaderComponent({
     element: document.querySelector(".header-container"),
   });
+
+  let pageNum = 0;
+  Like({ pageNum });
+
+  // addLike({ token: getToken() });
+  // const arrayLike = document.querySelectorAll(".like-button");
+  // for (const like of arrayLike) {
+  //   like.addEventListener("click", (e) => {
+  //     e.stopPropagation();
+  //     let postId = like.getAttribute("data-post-id");
+  //     let likeStatus = like.dataset.status;
+  //     let pageNum = 1;
+
+  //     addLike({
+  //       postId,
+  //       token: `Bearer ${user.token}`,
+  //       likeStatus,
+  //       pageNum,
+  //     }).then(() => {
+  //       goToPage(page);
+  //     });
+  //     // .catch((error) => {
+  //     //   console.warn(error);
+  //     //   alert("Не удалось поставить лайк. Попробуйте позже.");
+  //     // });
+  //   });
 }
 
-export function addLike() {
+export function Like({ pageNum }) {
   const arrayLike = document.querySelectorAll(".like-button");
   for (const like of arrayLike) {
     like.addEventListener("click", (e) => {
       e.stopPropagation();
-      const currentComment = comments[like.dataset.index];
-      currentComment.likeLoad = true;
-      delay(2000).then(() => {
-        if (currentComment.like === false) {
-          currentComment.like = true;
-          currentComment.likeCount++;
-        } else {
-          currentComment.like = false;
-          currentComment.likeCount--;
-        }
-        currentComment.likeLoad = false;
-        renderComments();
+      let postId = like.getAttribute("data-post-id");
+      let likeStatus = like.dataset.status;
+
+      addLike({
+        postId,
+        token: `Bearer ${user.token}`,
+        likeStatus,
+        pageNum,
       });
-      renderComments();
+      // renderPostsPageComponent({ appEl });
     });
   }
 }
