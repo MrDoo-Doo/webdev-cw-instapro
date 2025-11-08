@@ -12,10 +12,12 @@ export function renderAddPostPageComponent({ appEl, onAddPostClick }) {
     const appHtml = `
     <div class="page-container">
       <div class="header-container"></div>
-      Cтраница добавления поста
+      <div class="form-add-post">
+      <h2 class="form-add-post_text">Публикация поста</h2>
       <div class="upload-image-container"></div>
-      <input type="text" id="name-input" class="input" placeholder="Описание" />
+      <input type="text" id="name-input" class="input form-add-post_text" placeholder="Описание" />
       <button class="button" id="add-button">Добавить</button>
+      </div>
     </div>
   `;
 
